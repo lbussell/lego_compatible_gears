@@ -11,7 +11,7 @@ if (-not (Test-Path $OutputDir)) {
 }
 
 foreach ($size in $Sizes) {
-    $inputFile = "lego_compatible_gear.scad"
+    $inputFile = "gear.scad"
     $outputFile = "$OutputDir/gear_$size.stl"
     $cmd = "$OpenSCADPath -o $outputFile -D teeth=$size $inputFile"
     Write-Host "Running: $cmd"
