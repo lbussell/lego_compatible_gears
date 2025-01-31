@@ -1,122 +1,107 @@
 // https://github.com/dpellegr/PolyGear
 use <PolyGear.scad>
+use <common.scad>
+use <clutch.scad>
+use <cross_hole.scad>
 
-teeth = 16;
-width_studs = 1;
-width = studs(width_studs);
+$fn = 25;
+
+num_teeth = 32;
+is_clutch = false;
 taper = true;
+helix_angle = 0.0;
+wall_thickness = 1.0;
+cross_hole_fillet_r = 0.20;
+length = studs(1);
 
-/* [Hidden] */
-$fn = 50;
-cross_hole_diameter = 5.15;
-cross_width = 1.95;
+gear();
 
-axle_gear(num_teeth = teeth, width = width, taper = taper);
-
-module axle_gear(num_teeth = 16, width = studs(1), taper = true)
+module gear()
 {
-  fillet_radius = 0.20;
-  helix_angle = 0;
-  wall_thickness = 1.0;
-  magic_wall_number = 2.5;
-  inner_space_diameter = num_teeth - magic_wall_number - (2 * wall_thickness);
+    padding = 2.5;
+    gear_inner_diameter = gear_inner_diameter(num_teeth, padding, wall_thickness);
+    center_diameter = center_outer_diameter(wall_thickness, is_clutch);
 
-  // Support structure
-  support_length = (inner_space_diameter - cross_hole_diameter) / 2;
-  support_start = cross_hole_diameter / 2 + support_length / 2;
-  z = 0;
+    // sizes for taper //
+    // overall radius of the whole gear
+    r_outer = (num_teeth + padding) / 2;
+    // just to the edge of the wall
+    r_inner = gear_inner_diameter / 2 + wall_thickness;
 
-  small_r = inner_space_diameter / 2 + wall_thickness;
-  big_r = (teeth  + magic_wall_number) / 2;
-
-  intersection()
-  {
-    if (taper)
+    intersection()
     {
-      tapered_cylinder(big_r, small_r, width, width / 2);
-    }
-
-    union()
-    {
-      hollow_gear(num_teeth, width);
-      cross_hole(width, wall_thickness, fillet_radius);
-
-      translate([0,  support_start, z]) cube([wall_thickness, support_length, width], center = true);
-      translate([0, -support_start, z]) cube([wall_thickness, support_length, width], center = true);
-      translate([ support_start, 0, z]) cube([support_length, wall_thickness, width], center = true);
-      translate([-support_start, 0, z]) cube([support_length, wall_thickness, width], center = true);
-    }
-  }
-
-  module tapered_cylinder(r_outer, r_inner, h, h_inner)
-  {
-    h_outer = (h - h_inner) / 2;
-    outer_offset = (h_inner + h_outer) / 2;
-
-    cylinder(h = h_inner, r = r_outer, center = true);
-    translate([0, 0, outer_offset])
-    cylinder(h = h_outer, r1 = r_outer, r2 = r_inner, center = true);
-    translate([0, 0, -outer_offset])
-    cylinder(h = h_outer, r1 = r_inner, r2 = r_outer, center = true);
-  }
-
-  module hollow_gear(num_teeth, width)
-  {
-    fn = 10;
-    difference()
-    {
-      spur_gear(
-        n = num_teeth,
-        w = width,
-        helix_angle = helix_angle,
-        $fn = fn);
-      cylinder(
-        h = width,
-        r = inner_space_diameter / 2,
-        center = true);
-    }
-  }
-}
-
-module cross_hole(length, wall_thickness, fillet_radius = 0.20)
-{
-  translate([0, 0, -length / 2])
-  linear_extrude(length)
-  cross_hole_2d();
-
-  module cross_hole_2d()
-  {
-    difference()
-    {
-      circle(r = cross_hole_diameter / 2 + wall_thickness);
-      difference()
-      {
-        cross_2d_filleted();
-        difference()
+        if (taper)
         {
-          // Create a tube that cuts off the excess of the cross hole to round the outside edges
-          circle(r = cross_hole_diameter / 2 + wall_thickness);
-          circle(r = cross_hole_diameter / 2);
+            tapered_cylinder(
+                r_outer = r_outer,
+                r_inner = r_inner,
+                total_h = length,
+                h_inner = length / 2);
         }
-      }
+
+        union()
+        {
+            hollow_gear(num_teeth, length, gear_inner_diameter);
+            supports(
+                num_teeth = num_teeth,
+                length = length,
+                wall_thickness = wall_thickness,
+                gear_inner_diameter = gear_inner_diameter,
+                // provide some padding so that supports aren't just
+                // tangent to the outside of the center of the gear.
+                center_outer_diameter = center_diameter - (wall_thickness / 2));
+            center(is_clutch);
+        }
     }
-  }
 
-  module cross_2d_filleted()
-  {
-    offset(r = -fillet_radius)
-    offset(r = fillet_radius)
-    cross_2d();
-  }
-
-  module cross_2d()
-  {
-    union()
+    module center(is_clutch)
     {
-      square([cross_width, cross_hole_diameter], center = true);
-      square([cross_hole_diameter, cross_width], center = true);
+        if (is_clutch)
+        {
+            clutch();
+        }
+        else
+        {
+            cross_hole(
+                length = length,
+                wall_thickness = wall_thickness);
+        }
     }
-  }
 }
 
-function studs(n) = 8 * n - (0.1 * 2);
+module hollow_gear(num_teeth, length, inner_space_diameter)
+{
+    fn = 10;
+
+    difference()
+    {
+        spur_gear(
+            n = num_teeth,
+            w = length,
+            helix_angle = 0,
+            $fn = fn);
+        cylinder(
+            h = length,
+            r = inner_space_diameter / 2,
+            center = true);
+    }
+}
+
+module supports(num_teeth, length, wall_thickness, gear_inner_diameter, center_outer_diameter)
+{
+    support_length = (gear_inner_diameter - center_outer_diameter) / 2;
+    support_start = center_outer_diameter / 2 + support_length / 2;
+
+    translate([0,  support_start, 0]) cube([wall_thickness, support_length, length], center = true);
+    translate([0, -support_start, 0]) cube([wall_thickness, support_length, length], center = true);
+    translate([ support_start, 0, 0]) cube([support_length, wall_thickness, length], center = true);
+    translate([-support_start, 0, 0]) cube([support_length, wall_thickness, length], center = true);
+}
+
+function gear_inner_diameter(num_teeth, padding, wall_thickness) =
+    num_teeth - padding - (2 * wall_thickness);
+
+function center_outer_diameter(wall_thickness, is_clutch) =
+    is_clutch
+        ? clutch_outer_diameter()
+        : cross_hole_outer_diameter(wall_thickness);
