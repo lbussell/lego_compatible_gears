@@ -1,0 +1,58 @@
+{
+    "parameterSets": {
+        "design default values": {
+            "$fn": "25",
+            "cross_hole_fillet_r": "0.2",
+            "helix_angle": "0",
+            "is_clutch": "true",
+            "num_teeth": "16",
+            "taper": "true",
+            "wall_thickness": "1"
+        },
+        "gear_10": {
+            "num_teeth": "10"
+        },
+        "gear_12": {
+            "num_teeth": "12"
+        },
+        "gear_14": {
+            "num_teeth": "14"
+        },
+        "gear_16": {
+            "num_teeth": "16"
+        },
+        "gear_18": {
+            "num_teeth": "18"
+        },
+        "gear_20": {
+            "num_teeth": "20"
+        },
+        "gear_22": {
+            "num_teeth": "22"
+        },
+        "gear_24": {
+            "num_teeth": "24"
+        },
+        "clutch_gear_16": {
+            "num_teeth": "16",
+            "is_clutch": "true"
+        },
+        "clutch_gear_18": {
+            "num_teeth": "18",
+            "is_clutch": "true"
+        },
+        "clutch_gear_20": {
+            "num_teeth": "20",
+            "is_clutch": "true"
+        },
+        "clutch_gear_22": {
+            "num_teeth": "22",
+            "is_clutch": "true"
+        },
+        "clutch_gear_24": {
+            "num_teeth": "24",
+            "is_clutch": "true"
+        }
+    },
+    "fileFormatVersion": "1"
+}
