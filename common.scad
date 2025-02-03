@@ -12,3 +12,9 @@ module tapered_cylinder(r_outer, r_inner, total_h, h_inner)
     translate([0, 0, -outer_offset])
     cylinder(h = h_outer, r1 = r_inner, r2 = r_outer, center = true);
 }
+
+module repeatInCircle(n,di)
+{
+    for(i=[0:n-1])
+        rotate([0,0,(i+di)*360/n]) children();
+}
