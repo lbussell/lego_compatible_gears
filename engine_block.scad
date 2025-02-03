@@ -1,10 +1,10 @@
-$fn = 25;
+$fn = 50;
 
 stud_l = 8;
+stud_clearance = 0.1;
 
-piston_r = studs(0.6);
+piston_r = studs(0.62);
 
-// engine_block_l = studs(8);
 engine_block_l = studs(6);
 engine_block_w = studs(2);
 engine_block_h = studs(2);
@@ -12,13 +12,12 @@ engine_block_piston_r = studs(0.6);
 
 num_pistons = 4;
 
-wall_thickness = 1;
+wall_thickness = 1.1;
 
 piston_separation = studs(1 + 1/3);
 
 fudge = 0.1;
 
-translate([studs(-1), studs(0), -engine_block_h])
 engine_block();
 
 module engine_block()
@@ -50,11 +49,23 @@ module engine_block()
                 cylinder(h = studs(1), r = mount_outer_r, center = true);
 
                 translate([
+                    center_horiz - mount_offset_horiz,
+                    center_len - engine_block_l/2 + studs(1/2),
+                    mount_offset_vert / 2])
+                cube([mount_outer_r * 2, mount_outer_r * 2, mount_offset_vert], center = true);
+
+                translate([
                     center_horiz + mount_offset_horiz,
                     center_len - engine_block_l/2 + studs(1/2),
                     mount_offset_vert])
                 rotate([90, 0, 0])
                 cylinder(h = studs(1), r = mount_outer_r, center = true);
+
+                translate([
+                    center_horiz + mount_offset_horiz,
+                    center_len - engine_block_l/2 + studs(1/2),
+                    mount_offset_vert / 2])
+                cube([mount_outer_r * 2, mount_outer_r * 2, mount_offset_vert], center = true);
             }
 
             hull()
@@ -67,11 +78,23 @@ module engine_block()
                 cylinder(h = studs(1), r = mount_outer_r, center = true);
 
                 translate([
+                    center_horiz - mount_offset_horiz,
+                    center_len + engine_block_l/2 - studs(1/2),
+                    mount_offset_vert / 2])
+                cube([mount_outer_r * 2, mount_outer_r * 2, mount_offset_vert], center = true);
+
+                translate([
                     center_horiz + mount_offset_horiz,
                     center_len + engine_block_l/2 - studs(1/2),
                     mount_offset_vert])
                 rotate([90, 0, 0])
                 cylinder(h = studs(1), r = mount_outer_r, center = true);
+
+                translate([
+                    center_horiz + mount_offset_horiz,
+                    center_len + engine_block_l/2 - studs(1/2),
+                    mount_offset_vert / 2])
+                cube([mount_outer_r * 2, mount_outer_r * 2, mount_offset_vert], center = true);
             }
         }
 
@@ -101,17 +124,16 @@ module engine_block()
         rotate([90, 0, 0])
         positive_axle_hole(l = studs(1));
 
-        // for (i = [0:num_pistons - 1])
-        // {
-        //     translate([engine_block_w / 2, studs(1) + i * piston_separation, 0])
-        //     cylinder(h = 2 * engine_block_h + fudge, r = studs(0.6), center = true);
-        // }
-
         for (i = [0:num_pistons - 1])
         {
             translate([engine_block_w / 2, studs(1) + i * piston_separation, -fudge])
             cylinder(h = engine_block_h + 2*fudge, r = piston_r);
         }
+
+        intrusion = studs(0.9) + fudge;
+        translate([0, 0, engine_block_h - intrusion / 2 + fudge])
+            linear_extrude(height = intrusion, center = true)
+            engine_block_inset();
     }
 }
 
@@ -124,38 +146,25 @@ module simple_engine_block_2d()
     {
         offset(r = corner_radius) offset(r = -corner_radius)
         square([engine_block_w, engine_block_l]);
-
-        // for (i = [0:num_pistons - 1])
-        // {
-        //     translate([engine_block_w / 2, studs(1) + i * piston_separation, 0])
-        //     circle(r = piston_r);
-        // }
     }
 }
 
-
-module engine_block_2d()
+module engine_block_inset()
 {
     corner_radius = studs(1/2);
 
-    union()
+    difference()
     {
-        difference()
-        {
-            offset(r = corner_radius) offset(r = -corner_radius)
-            square([engine_block_w, engine_block_l]);
+        // simple_engine_block_2d();
+        offset(delta = -wall_thickness) 
+        block();
+    }
 
-            offset(r = corner_radius - wall_thickness) offset(r = -corner_radius)
-            square([engine_block_w, engine_block_l]);
-        }
-
-        difference()
+    module block()
+    {
+        difference ()
         {
-            for (i = [0:num_pistons - 1])
-            {
-                translate([engine_block_w / 2, studs(1) + i * piston_separation, 0])
-                circle(r = piston_r + wall_thickness);
-            }
+            simple_engine_block_2d();
             for (i = [0:num_pistons - 1])
             {
                 translate([engine_block_w / 2, studs(1) + i * piston_separation, 0])
@@ -167,7 +176,7 @@ module engine_block_2d()
 
 module positive_axle_hole(l = studs(1))
 {
-    axle_hole_inner_d = 5.0;
+    axle_hole_inner_d = 5.1;
     axle_hole_inner_r = axle_hole_inner_d / 2;
     depth = 0.7;
     width = 0.6;
@@ -183,3 +192,5 @@ module positive_axle_hole(l = studs(1))
 }
 
 function studs(n) = n * stud_l;
+
+function c_studs(n) = n * stud_l - 2 * stud_clearance;
