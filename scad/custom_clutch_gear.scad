@@ -4,7 +4,7 @@ use <common.scad>
 use <clutch.scad>
 use <cross_hole.scad>
 
-part = "bushing";
+part = "fork";
 num_teeth = 18;
 is_clutch = true;
 
@@ -17,7 +17,7 @@ driving_ring_length = studs(1);
 driving_ring_clearance = 0.15;
 driving_ring_wall_thickness = 1;
 
-cross_hole_inner_d = 4.92;
+cross_hole_inner_d = 4.93;
 cross_hole_inner_r = cross_hole_inner_d / 2;
 
 bushing_wall_thickness = 1.0;
@@ -240,7 +240,7 @@ module driving_ring_interface()
     }
 }
 
-shift_fork_dr_clearance = 0.4;
+shift_fork_dr_clearance = 0.35;
 shift_fork_gear_clearance = studs(1/4);
 shift_fork_wall_thickness = 1.0;
 
@@ -257,15 +257,18 @@ module shift_fork(connector_position = [8*2, 0, 0])
     {
         union()
         {
-            // translate(connector_position)
-            //     cylinder(h = studs(1), r = studs(1) / 2, center = true);
             linear_extrude(height = studs(1), center = true)
                 connector_outer_2d();
+
 
             // outer
             difference()
             {
-                cylinder(h = shift_fork_length, r = shift_fork_outer_r, center = true);
+                union()
+                {
+                    linear_extrude(height = shift_fork_thickness + 1, center = true) frame_2d();
+                    cylinder(h = shift_fork_length, r = shift_fork_outer_r, center = true);
+                }
                 cylinder(h = shift_fork_length, r = shift_fork_inner_r, center = true);
             }
 
@@ -276,7 +279,6 @@ module shift_fork(connector_position = [8*2, 0, 0])
                 cylinder(h = shift_fork_indent_h, r = shift_fork_inner_r - shift_fork_indent_depth, center = true);
             }
 
-            linear_extrude(height = shift_fork_thickness, center = true) frame_2d();
         }
 
         cylinder(h = shift_fork_indent_h, r = shift_fork_inner_r - shift_fork_indent_depth, center = true);
