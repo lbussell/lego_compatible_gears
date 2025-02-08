@@ -4,7 +4,7 @@ use <common.scad>
 use <clutch.scad>
 use <cross_hole.scad>
 
-part = "gear";
+part = "bushing";
 num_teeth = 18;
 is_clutch = true;
 
