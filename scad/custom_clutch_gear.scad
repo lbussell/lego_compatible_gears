@@ -17,7 +17,7 @@ driving_ring_length = studs(1);
 driving_ring_clearance = 0.15;
 driving_ring_wall_thickness = 1;
 
-cross_hole_inner_d = 4.90;
+cross_hole_inner_d = 4.92;
 cross_hole_inner_r = cross_hole_inner_d / 2;
 
 bushing_wall_thickness = 1.0;
@@ -30,7 +30,7 @@ clutch_teeth_width = 0.8;
 driving_ring_outer_r = 7.0;
 driving_ring_inner_r = driving_ring_outer_r - driving_ring_wall_thickness;
 
-driving_ring_bushing_outer_r = cross_hole_inner_d / 2 + bushing_wall_thickness;
+driving_ring_bushing_outer_r = (5.0 / 2) + 1;
 
 shift_fork_indent_h = studs(1/4);
 shift_fork_indent_depth = 1.5;
@@ -187,7 +187,7 @@ module custom_clutch_gear(num_teeth, is_clutch = true)
     inner = driving_ring_bushing_outer_r + driving_ring_clearance;
     outer = is_clutch
         ? inner + axle_hole_wall_thickness
-        : cross_hole_inner_r + bushing_wall_thickness;
+        : driving_ring_bushing_outer_r;
     teeth_outer = outer + clutch_extrusion;
 
     difference()
@@ -240,7 +240,7 @@ module driving_ring_interface()
     }
 }
 
-shift_fork_dr_clearance = 0.15;
+shift_fork_dr_clearance = 0.4;
 shift_fork_gear_clearance = studs(1/4);
 shift_fork_wall_thickness = 1.0;
 
