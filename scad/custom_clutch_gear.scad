@@ -17,7 +17,7 @@ driving_ring_length = studs(1);
 driving_ring_clearance = 0.15;
 driving_ring_wall_thickness = 1;
 
-cross_hole_inner_d = 4.93;
+cross_hole_inner_d = 5.00;
 cross_hole_inner_r = cross_hole_inner_d / 2;
 
 bushing_wall_thickness = 1.0;
