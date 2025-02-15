@@ -182,48 +182,6 @@ module driving_ring()
     }
 }
 
-module custom_clutch_gear(num_teeth, is_clutch = true)
-{
-    inner = driving_ring_bushing_outer_r + driving_ring_clearance;
-    outer = is_clutch
-        ? inner + axle_hole_wall_thickness
-        : driving_ring_bushing_outer_r;
-    teeth_outer = outer + clutch_extrusion;
-
-    difference()
-    {
-        union()
-        {
-            translate([0, 0, -total_length / 2 + gear_length / 2])
-            spur_gear(n = num_teeth, w = gear_length, helix_angle = 0);
-
-            cylinder(h = total_length, r = outer, center = true);
-
-            if (is_clutch)
-            {
-                clutch_teeth();
-            }
-        }
-
-        if (is_clutch)
-        {
-            cylinder(h = total_length, r = inner, center = true);
-        }
-        else
-        {
-            linear_extrude(height = total_length, center = true)
-                cross_2d_rounded(cross_hole_inner_d);
-        }
-    }
-
-    module clutch_teeth()
-    {
-        repeatInCircle(n = clutch_teeth, di = 0)
-            translate([teeth_outer / 2, 0, 0])
-            cube(size = [teeth_outer, clutch_teeth_width, total_length], center=true);
-    }
-}
-
 module driving_ring_interface()
 {
     fudge = -1;
