@@ -195,9 +195,3 @@ module custom_clutch_gear(
     }
 
 }
-
-stud_clearance = 0.1;
-
-function cstuds(n) = studs(n) - (2 * stud_clearance);
-
-function studs(n) = 8 * n;

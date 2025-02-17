@@ -8,8 +8,12 @@ stud_clearance = 0.1;
 
 // Technic //
 
-// Inner diameter of a technic pin hole
-pin_hole_d = 4.85;
+// Inner diameter of a technic pin hole - this is allegedly 4.85
+pin_hole_d = 5.1;
+pin_con_depth = 0.7;
+pin_con_width = 0.6;
+pin_con_d = pin_hole_d + 2*pin_con_width;
+
 true_pin_hole_d = 5.0;
 true_pin_hole_r = true_pin_hole_d / 2;
 

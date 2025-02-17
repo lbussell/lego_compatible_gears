@@ -1,5 +1,9 @@
 
-function studs(n) = 8 * n - (0.1 * 2);
+include <lego_dimensions.scad>;
+
+function studs(n) = n * stud_spacing;
+
+function cstuds(n) = studs(n) - (2 * stud_clearance);
 
 module bevel_cylinder(r_outer, r_inner, total_h, h_inner)
 {
