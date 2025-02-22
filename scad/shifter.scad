@@ -5,6 +5,7 @@ include <dimensions.scad>
 tow_ball_clearance = 0.1;
 connector_clearance = 0.1;
 num_beams = 3;
+scoop = true;
 
 angleX = 60;
 angleY = 60;
@@ -12,7 +13,7 @@ angleY = 60;
 /* [Hidden] */
 $fn = 50;
 
-render() shifter_travel(angleX, angleY);
+render() shifter_travel(angleX, angleY, tow_ball_clearance, connector_clearance);
 
 // The basic idea is that we'll take a lego element, 32034
 // https://www.bricklink.com/v2/catalog/catalogitem.page?P=32034
@@ -23,12 +24,87 @@ module shifter_travel(angleX, angleY, tow_ball_clearance = 0.0, connector_cleara
 {
     tow_ball_r = tow_ball_d / 2 + tow_ball_clearance;
 
-    shifter_travel(angleX, angleY);
-
-    *difference()
+    distribute(spacing = 16)
     {
-        beams();
-        shifter_travel(angleX, angleY);
+        cleared_beam(x = 0);
+        cleared_beam(x = -1);
+        cleared_beam(x = -0.5);
+    }
+
+    module shifted_shifter(x = 0)
+    {
+        step = 0.25;
+
+        r() 
+        {
+            shifter_part1();
+            shifter_part2();
+            shifter_part3();
+        }
+
+        module r()
+        {
+            for (c = [0 : $children-1])
+            {
+                for (i = [-studs(1) : step : studs(1) - step])
+                {
+                    hull()
+                    {
+                        s([studs(x), i, studs(2)]) children(c);
+                        s([studs(x), i + step, studs(2)]) children(c);
+                    }
+                }
+            }
+        }
+
+        module s(v)
+        {
+            translate(v)
+                rotate(lookAt(v, [0, 0, 0]))
+                rotate([0, 180, 0])
+                children();
+        }
+    }
+
+    module shifter_part1() shifter_connector(scoop=scoop);
+    module shifter_part2() translate([0, 0, -studs(2)]) tow_ball();
+    module shifter_part3() translate([0, 0, -studs(2)]) tow_ball_pin();
+        
+    module cleared_beam(x = 0)
+    {
+        shifter_pos = [studs(x), 0, studs(2)];
+
+        difference()
+        {
+            actual_beam(length = 5);
+
+            shifted_shifter(x);
+
+            translate([studs(x), 0, studs(2)])
+            {
+                if (x == 0)
+                {
+                    hull() rotated_shifter(y = 100);
+                }
+                else
+                {
+                    v = lookAt(shifter_pos, [0, 0, 0]);
+                    y = 2*(180-v[1]);
+                    echo(v);
+                    echo(y);
+
+                    hull() rotated_shifter(y = y);
+                }
+            }
+        }
+    }
+
+    module s(v)
+    {
+        translate(v)
+            rotate(lookAt(v, [0, 0, 0]))
+            rotate([0, 180, 0])
+            shifter();
     }
 
     // Y angle = side to side movement
@@ -48,17 +124,20 @@ module shifter_travel(angleX, angleY, tow_ball_clearance = 0.0, connector_cleara
             rotate([0, -angleY/2, 0]) rotated_shifter(x = angleX);
             rotate([0, angleY/2, 0]) rotated_shifter(x = angleX);
         }
+    }
 
-        module rotated_shifter(x = 0, y = 0)
+    module rotated_shifter(x = 0, y = 0)
+    {
+        rotate_all(x, y)
         {
-            rotate_all(x, y)
-            {
-                shifter_connector(scoop=true);
-                translate([0, 0, -studs(2)]) tow_ball();
-                translate([0, 0, -studs(2)]) tow_ball_pin();
-            }
+            shifter_connector(scoop=scoop);
+            translate([0, 0, -studs(2)]) tow_ball();
+            translate([0, 0, -studs(2)]) tow_ball_pin();
+        }
 
-            module rotate_all(x = 0, y = 0)
+        module rotate_all(x = 0, y = 0)
+        {
+            union()
             {
                 if (x != 0)
                 {
@@ -76,25 +155,25 @@ module shifter_travel(angleX, angleY, tow_ball_clearance = 0.0, connector_cleara
                     }
                 }
             }
+        }
 
-            module rotate_x(angle)
+        module rotate_x(angle)
+        {
+            for (i = [0 : $children-1])
             {
-                for (i = [0 : $children-1])
-                {
-                    rotate([0, 0, 90])
-                    rotate_extrude_3d(angle = angle, start = -angle/2)
-                    rotate([0, 0, 90])
-                    children(i);
-                }
+                rotate([0, 0, 90])
+                rotate_extrude_3d(angle = angle, start = -angle/2)
+                rotate([0, 0, 90])
+                children(i);
             }
+        }
 
-            module rotate_y(angle)
+        module rotate_y(angle)
+        {
+            for (i = [0 : $children-1])
             {
-                for (i = [0 : $children-1])
-                {
-                    rotate_extrude_3d(angle = angle, start = -angle/2)
-                    children(i);
-                }
+                rotate_extrude_3d(angle = angle, start = -angle/2)
+                children(i);
             }
         }
     }
@@ -159,9 +238,9 @@ module shifter_travel(angleX, angleY, tow_ball_clearance = 0.0, connector_cleara
     module shifter_connector(scoop = false)
     {
         // The element 32034 1x1x3 studs.
-        shifter_h = studs(3);
-        shifter_w = studs(1);
-        shifter_l = studs(1);
+        shifter_h = studs(3) + 2*connector_clearance;
+        shifter_w = studs(1) + 2*connector_clearance;
+        shifter_l = studs(1) + 2*connector_clearance;
 
         difference()
         {
@@ -190,20 +269,6 @@ module shifter_travel(angleX, angleY, tow_ball_clearance = 0.0, connector_cleara
     module tow_ball_pin() cylinder(r = tow_ball_r/2, h = studs(1.5));
     module tow_ball() sphere(r = tow_ball_r);
 
-    module connector_cutout()
-    {
-        // The element 32034 1x1x3 studs.
-        shifter_h = studs(3);
-        shifter_w = studs(1);
-        shifter_l = studs(1);
-
-        // Calculate the distance from origin to the corner of the connector
-        // which is the furthest away from the origin.
-        shifter_sphere_r = sqrt(shifter_w^2 + shifter_l^2 + shifter_h^2) / 2 + connector_clearance;
-
-        sphere(r = shifter_sphere_r);
-    }
-
     module tow_ball_cutout()
     {
         union()
@@ -225,43 +290,43 @@ module shifter_travel(angleX, angleY, tow_ball_clearance = 0.0, connector_cleara
         if (num_beams == 3)
         {
             translate([0, 0, studs(-2)])
-                // color("olivedrab")
+                color("olivedrab")
                 actual_beam(length = _beam_l);
 
             translate([studs(1), 0, studs(-2)])
-                // color("royalblue")
+                color("royalblue")
                 actual_beam(length = _beam_l);
 
             translate([studs(-1), 0, studs(-2)])
-                // color("palevioletred")
+                color("palevioletred")
                 actual_beam(length = _beam_l);
         }
         else if (num_beams == 2)
         {
             translate([studs(0.5), 0, studs(-2)])
-                // color("royalblue")
+                color("royalblue")
                 actual_beam(length = _beam_l);
 
             translate([studs(-0.5), 0, studs(-2)])
-                // color("palevioletred")
+                color("palevioletred")
                 actual_beam(length = _beam_l);
         }
 
+    }
 
-        module beam_basic(length = 5)
-        {
-            _h = studs(1);
-            _w = studs(1);
-            _l = studs(length);
+    module beam_basic(length = 5)
+    {
+        _h = studs(1);
+        _w = studs(1);
+        _l = studs(length);
 
-            color("olivedrab") cube([_w, _l, _h], center = true);
-        }
+        color("olivedrab") cube([_w, _l, _h], center = true);
+    }
 
-        module actual_beam(length = 5)
-        {
-            cube([cstuds(1), cstuds(1), cstuds(1)], center = true);
-                rotate([0, 0, 90])
-                beam(length = length, center = true);
-        }
+    module actual_beam(length = 5)
+    {
+        cube([cstuds(1), cstuds(1), cstuds(1)], center = true);
+            rotate([0, 0, 90])
+            beam(length = length, center = true);
     }
 }
