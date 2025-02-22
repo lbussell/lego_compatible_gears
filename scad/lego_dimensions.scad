@@ -24,3 +24,6 @@ pin_hole_outer_d = true_pin_hole_d + 2;
 
 // Technic gear module is always 1
 gear_module = 1;
+
+// https://www.newelementary.com/2017/01/bar1l-with-towbar-22484-LEGO-part-design-ID.html
+tow_ball_d = 5.9;

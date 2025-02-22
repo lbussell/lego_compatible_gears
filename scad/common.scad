@@ -23,20 +23,20 @@ module repeatInCircle(n,di)
         rotate([0,0,(i+di)*360/n]) children();
 }
 
-module stud_grid()
+module preview()
 {
-    for (i = [0:4])
+    color("crimson", 0.3)
+    children();
+}
+
+module stud_grid(x, y, z)
+{
+    for (i = [0:x-1])
     {
-        for (j = [0:4])
+        for (j = [0:y-1])
         {
-            // for (k = [0:4])
-            // {
-                // translate([i * 8, j * 8, k * 8])
                 translate([i * 8, j * 8])
-                color("crimson", 0.3)
-                // cylinder(r = cross_hole_inner_r, h = 1, center = true);
-                sphere(r = 0.5);
-            // }
+                color("crimson", 0.3) sphere(r = 0.5, $fn = 10);
         }
     }
 }
