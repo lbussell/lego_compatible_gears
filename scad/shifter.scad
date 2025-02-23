@@ -96,6 +96,21 @@ module shifter_travel(angleX, angleY, tow_ball_clearance = 0.0, connector_cleara
                     hull() rotated_shifter(y = y);
                 }
             }
+
+            translate([0, studs(2), 0]) half_pin_connector();
+            translate([0, studs(-2), 0]) half_pin_connector();
+        }
+
+        module half_pin_connector()
+        {
+            union()
+            {
+                translate([pin_con_depth / 2, 0, 0])
+                    rotate([0, 90, 0])
+                    cylinder(h = pin_con_depth, d = pin_con_d + pin_con_width/2, center = true);
+                translate([-studs(0.5), -studs(0.5), -studs(0.5)])
+                    cube([studs(0.5), studs(1), studs(1)]);
+            }
         }
     }
 

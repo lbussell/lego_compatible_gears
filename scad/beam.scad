@@ -78,10 +78,10 @@ module pin_connector(center = false)
     translate(t) union()
     {
         cylinder(h = s_length, r = pin_hole_r);
-        translate([0, 0, pin_con_depth])
-        cylinder(h = 2*pin_con_depth, r = pin_hole_r + pin_con_width, center = true);
-        translate([0, 0, s_length - pin_con_depth])
-        cylinder(h = 2*pin_con_depth, r = pin_hole_r + pin_con_width, center = true);
+        translate([0, 0, pin_con_depth/2])
+        cylinder(h = pin_con_depth, r = pin_hole_r + pin_con_width, center = true);
+        translate([0, 0, s_length - pin_con_depth/2])
+        cylinder(h = pin_con_depth, r = pin_hole_r + pin_con_width, center = true);
     }
 }
 
