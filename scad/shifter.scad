@@ -15,11 +15,6 @@ $fn = 50;
 
 render() shifter_travel(angleX, angleY, tow_ball_clearance, connector_clearance);
 
-// The basic idea is that we'll take a lego element, 32034
-// https://www.bricklink.com/v2/catalog/catalogitem.page?P=32034
-// and rotate it around its center point.
-// We should create a sphere which provides enough clearance for the connector 
-// to spin freely about its center.
 module shifter_travel(angleX, angleY, tow_ball_clearance = 0.0, connector_clearance = 0.0)
 {
     tow_ball_r = tow_ball_d / 2 + tow_ball_clearance;
