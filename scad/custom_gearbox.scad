@@ -4,7 +4,7 @@ use <common.scad>
 use <clutch.scad>
 use <cross_hole.scad>
 
-part = "fork";
+part = "fork"; // ["driving_ring", "bushing", "fork", "fork_offset"]
 num_teeth = 18;
 is_clutch = true;
 
@@ -66,11 +66,6 @@ module assembly()
     if (part == "bushing")
     {
         color("firebrick") driving_ring_bushing();
-    }
-
-    if (part == "gear")
-    {
-        color("dodgerblue") custom_clutch_gear(num_teeth = num_teeth, is_clutch = is_clutch);
     }
 
     if (debug)
