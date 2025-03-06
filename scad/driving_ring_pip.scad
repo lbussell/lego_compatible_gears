@@ -40,6 +40,8 @@ module driving_ring_pip()
 
     module driving_ring()
     {
+        _inner_r = drac_outer_r + 1 + Driving_Ring_Axle_Connector_Clearance;
+
         union()
         {
             difference()
@@ -48,17 +50,19 @@ module driving_ring_pip()
                 linear_extrude(h = _h, center = true)
                     offset(r = Driving_Ring_Axle_Connector_Clearance)
                     driving_ring_interface();
-                cones();
+                inset();
             }
 
+            // Divot for fixed driving ring positions
             _circle_pos = drac_outer_r + 1.5;
             _circle_r = 0.7;
             *rotate_extrude() translate([_circle_pos, 0]) circle(r = _circle_r);
+
+            clutch_teeth();
         }
 
-        module cones()
+        module inset()
         {
-            _inner_r = drac_outer_r + 1 + Driving_Ring_Axle_Connector_Clearance;
             _outer_r = dr_inner_r;
             _inner_inner_r = drac_outer_r - 1;
 
@@ -73,6 +77,17 @@ module driving_ring_pip()
 
             translate([0, 0, -_h/4])
             cylinder(h = _h/8, r1 = _inner_r, r2 = _inner_inner_r);
+        }
+
+        module clutch_teeth()
+        {
+            _outer_r = dr_inner_r;
+            _clutch_extrusion = _outer_r - _inner_r - 0.25;
+
+            mirror([0, 0, 1])
+            repeatInCircle(n = 4, di = 90)
+            translate([_outer_r - _clutch_extrusion/2, 0, 0])
+            cube([_clutch_extrusion, clutch_teeth_width, _h + fudge], center = true);
         }
     }
 
