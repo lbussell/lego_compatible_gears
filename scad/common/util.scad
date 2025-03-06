@@ -1,4 +1,3 @@
-
 include <lego_dimensions.scad>;
 
 function studs(n) = n * stud_spacing;

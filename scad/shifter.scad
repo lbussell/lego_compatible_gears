@@ -1,6 +1,6 @@
-use <common.scad>
+use <common/util.scad>
 use <beam.scad>
-include <dimensions.scad>
+include <common/dimensions.scad>
 
 tow_ball_clearance = 0.1;
 connector_clearance = 0.1;

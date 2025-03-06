@@ -1,6 +1,6 @@
-use <common.scad>
+use <common/util.scad>
 
-include <dimensions.scad>
+include <common/dimensions.scad>
 
 $fn = 35;
 

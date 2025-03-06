@@ -1,4 +1,4 @@
-include <../dimensions.scad>
+include <../common/dimensions.scad>
 
 module axle_connector_with_relief_2d(use_small_relief = false)
 {

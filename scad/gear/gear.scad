@@ -1,10 +1,10 @@
 // https://github.com/dpellegr/PolyGear
 use <PolyGear.scad>
-use <../common.scad>
+use <../common/util.scad>
 use <../clutch.scad>
 use <../cross_hole.scad>
 
-include <../dimensions.scad>
+include <../common/dimensions.scad>
 use <axle_connector.scad>
 
 num_teeth = 16;
