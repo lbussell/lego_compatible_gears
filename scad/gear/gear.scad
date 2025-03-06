@@ -39,7 +39,7 @@ render()
 module custom_clutch_gear(
     num_teeth,
     length = cstuds(1),
-    gear_ratio = 1/2,
+    gear_ratio = 3/4,
     is_clutch = false,
     center = false,
     chamfer = false)
