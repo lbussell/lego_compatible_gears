@@ -1,5 +1,6 @@
 use <common/util.scad>
 use <driving_ring_interface.scad>
+use <driving_ring_axle_connector.scad>
 use <gear/gear.scad>
 
 include <common/dimensions.scad>
@@ -51,31 +52,39 @@ module driving_ring_pip()
 
     module assembly()
     {
-        union() 
+        union()
         {
             color("darkcyan", 1) driving_ring();
             color("peru", 1) shift_fork();
+        }
 
-            *color("peru", 1)
-                rotate([0, 0, 70])
-                translate([0, 0, -6])
-                difference()
+        !driving_ring_axle_connector();
+
+        tapered_clutch_gear(num_teeth = 18);
+        mirror([0, 0, 1])
+            tapered_clutch_gear(num_teeth = 22);
+    }
+
+    module tapered_clutch_gear(num_teeth)
+    {
+        color("peru", 1)
+            rotate([0, 0, 70])
+            translate([0, 0, -8])
+            difference()
+        {
+            custom_clutch_gear(num_teeth, is_clutch = true);
+
+            difference()
             {
-                custom_clutch_gear(num_teeth = 20, is_clutch = true);
-
-                difference()
-                {
-                    translate([0,0,studs(1/4)]) cylinder(h = studs(1/4)-0.1, r = 14);
-                    translate([0,0,cstuds(3/4)]) rotate([0, 180, 0])
-                        inset_impl(clearance = 0.1);
-                }
+                translate([0,0,studs(1/4)]) cylinder(h = studs(1/4)-0.1, r = 14);
+                translate([0,0,cstuds(3/4)]) rotate([0, 180, 0])
+                    inset_impl(clearance = 0.1);
             }
         }
     }
 
     module driving_ring()
     {
-
         union()
         {
             difference()
@@ -86,11 +95,6 @@ module driving_ring_pip()
                     driving_ring_interface();
                 inset();
             }
-
-            // Divot for fixed driving ring positions
-            _circle_pos = drac_outer_r + 1.5;
-            _circle_r = 0.7;
-            *rotate_extrude() translate([_circle_pos, 0]) circle(r = _circle_r);
 
             clutch_teeth();
         }
